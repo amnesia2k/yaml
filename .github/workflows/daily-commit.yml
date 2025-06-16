@@ -22,8 +22,8 @@ jobs:
 
       - name: Setup Git
         run: | 
-          git config user.name "GitHub Actions Bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "amnesia2k"
+          git config user.email "141744972+amnesia2k@users.noreply.github.com"
 
       - name: Create or Update file with current date
         run: |
