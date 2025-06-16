@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true # this ensures the GITHUB_TOKEN is saved for pushing
+          fetch-depth: 0
 
       - name: Generate Timestamp
         id: timestamp
