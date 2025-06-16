@@ -16,9 +16,6 @@ jobs:
   commit:
     runs-on: ubuntu-latest
 
-    env: 
-      TIMESTAMP: ${{ steps.timestamp.outputs.utc }}
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -34,11 +31,14 @@ jobs:
 
       - name: Create orUpdate file with current date
         run: |
-          echo "Last updated: $TIMESTAMP" > last_activity.txt
+          echo "Last updated: ${{ steps.timestamp.outputs.utc }}" > last_activity.txt
           echo "Updated Daily by GitHub Actions." >> last_activity.txt
 
       - name: Commit and Push changes
         run: |
           git add last_activity.txt
-          git commit -m "Automated daily activity: $TIMESTAMP" || echo "No changes to commit."
+          git commit -m "Automated daily activity: ${{ steps.timestamp.outputs.utc }}" || echo "No changes to commit."
           git push -u origin main
+
+          env: 
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
