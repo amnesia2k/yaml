@@ -1,65 +1,36 @@
 name: Daily Commit
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow at 4 AM UTC every day.
-  # The cron syntax is 'minute hour day_of_month month day_of_week'
-  # '0 4 * * *' means at minute 0, hour 4, every day, every month, every day of the week.
   schedule:
-    - cron: '0 5 * * *'
-
-  # Allows you to run this workflow manually from the Actions tab in your repository.
+    - cron: '0 5 * * *'  # Runs daily at 05:00 UTC
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   commit:
-    # Specifies that the job will run on the latest Ubuntu environment.
     runs-on: ubuntu-latest
 
-    # Grants write permissions to the GITHUB_TOKEN for this job.
-    # This is crucial for pushing changes to the repository.
-    permissions:
-      contents: write
-
-    # Steps represent a sequence of tasks that will be executed as part of the job.
     steps:
       - name: Checkout Repository
-        # Uses the actions/checkout action to check out your repository code.
-        # This is necessary so the workflow can modify files.
         uses: actions/checkout@v4
 
       - name: Generate Timestamp
-        id: timestamp # Assigns an ID to this step to reference its outputs later.
-        # Runs a shell command to generate the current UTC date and time.
-        # The '>> "$GITHUB_OUTPUT"' redirects the output to make it accessible
-        # as a step output.
+        id: timestamp
         run: echo "utc=$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> "$GITHUB_OUTPUT"
 
       - name: Setup Git
-        # Configures the Git user name and email for the commits made by the workflow.
-        # Using the GitHub Actions bot email is a standard practice.
-        run: |
+        run: | 
           git config user.name "GitHub Actions Bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Create or Update file with current date
-        # Creates or overwrites 'last_activity.txt' with the generated timestamp
-        # and a static message.
         run: |
           echo "Last updated: ${{ steps.timestamp.outputs.utc }}" > last_activity.txt
           echo "Updated Daily by GitHub Actions." >> last_activity.txt
 
       - name: Commit and Push changes
-        # Adds the 'last_activity.txt' file to the Git staging area.
-        # Commits the changes with a dynamic message, or echoes "No changes to commit."
-        # if there are no changes to the file (preventing workflow failure).
-        # Pushes the committed changes to the 'main' branch of the 'origin' remote.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git add last_activity.txt
           git commit -m "Automated daily activity: ${{ steps.timestamp.outputs.utc }}" || echo "No changes to commit."
-          git push
-        # This 'env' block correctly passes the GITHUB_TOKEN as an environment variable
-        # for the 'git push' command, authenticating the push operation.
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push origin main
