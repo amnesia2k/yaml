@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true # this ensures the GITHUB_TOKEN is saved for pushing
+          persist-credentials: false  # 👈 disable default GITHUB_TOKEN
           fetch-depth: 0
 
       - name: Generate Timestamp
@@ -31,11 +31,10 @@ jobs:
           echo "Updated Daily by GitHub Actions." >> last_activity.txt
 
       - name: Commit and Push changes
-        # env:
-        #   TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+        env:
+          TOKEN: ${{ secrets.PERSONAL_TOKEN }}  # 👈 reference your repo secret
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
           git add last_activity.txt
           git commit -m "Automated daily activity: ${{ steps.timestamp.outputs.utc }}" || echo "No changes to commit."
           git push origin main
-
