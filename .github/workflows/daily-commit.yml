@@ -2,7 +2,7 @@ name: Daily Commit
 
 on:
   schedule:
-    - cron: '0 7 * * *'  # Runs daily at 07:00 UTC
+    - cron: '0 */6 * * *'  # Runs every 6 hours
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: false  # 👈 disable default GITHUB_TOKEN
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Generate Timestamp
@@ -32,7 +32,7 @@ jobs:
 
       - name: Commit and Push changes
         env:
-          TOKEN: ${{ secrets.PERSONAL_TOKEN }}  # 👈 reference your repo secret
+          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
           git add last_activity.txt
