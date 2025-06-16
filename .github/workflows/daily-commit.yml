@@ -1,0 +1,44 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Daily Commit
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  schedule:
+    - cron: '0 4 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  commit:
+    runs-on: ubuntu-latest
+
+    env: 
+      TIMESTAMP: ${{ steps.timestamp.outputs.utc }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate Timestamp
+        id: timestamp
+        run: echo "utc=$(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Git
+        run: | 
+          git config user.name "GitHub Actions Bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Create orUpdate file with current date
+        run: |
+          echo "Last updated: $TIMESTAMP" > last_activity.txt
+          echo "Updated Daily by GitHub Actions." >> last_activity.txt
+
+      - name: Commit and Push changes
+        run: |
+          git add last_activity.txt
+          git commit -m "Automated daily activity: $TIMESTAMP" || echo "No changes to commit."
+          git push -u origin main
