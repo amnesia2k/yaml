@@ -32,7 +32,7 @@ jobs:
 
       - name: Commit and Push changes
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: |
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}.git
           git add last_activity.txt
